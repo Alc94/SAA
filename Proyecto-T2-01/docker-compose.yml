@@ -1,0 +1,25 @@
+services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password123
+      POSTGRES_DB: zoologicdb
+    ports:
+      - "5432:5432"
+
+  backend:
+    build: 
+      context: ./Backend
+    ports:
+      - "5000:8080"
+    depends_on:
+      - db
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=zoologicdb;Username=admin;Password=password123;
+
+  frontend:
+    build: 
+      context: ./Frontend
+    ports:
+      - "4200:80"
