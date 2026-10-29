@@ -1,0 +1,245 @@
+<!-- Progreso de lectura -->
+<div class="fixed left-0 top-0 z-[60] h-0.5 bg-electric-400" [style.width.%]="progress()" aria-hidden="true"></div>
+
+<!-- Navegación lateral por secciones -->
+<nav aria-label="Secciones de la página" class="fixed right-5 top-1/2 z-40 hidden -translate-y-1/2 flex-col gap-3.5 xl:flex">
+  @for (s of sections; track s.id) {
+    <a [href]="'#' + s.id" (click)="scrollTo($event, s.id)" [attr.aria-label]="s.label"
+       [attr.aria-current]="active() === s.id ? 'true' : null" class="group flex items-center justify-end gap-3">
+      <span class="rounded bg-ink-950/90 px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">{{ s.label }}</span>
+      <span class="block h-2.5 w-2.5 rounded-full border border-electric-400 transition-all duration-300"
+            [class.bg-electric-400]="active() === s.id" [class.scale-150]="active() === s.id"></span>
+    </a>
+  }
+</nav>
+
+<!-- ============ 1. PRESENTACIÓN ============ -->
+<section id="inicio" data-section class="relative flex min-h-screen items-center overflow-hidden bg-forest-950 pb-16 pt-28">
+  <div class="bg-contours pointer-events-none absolute inset-0 opacity-30" aria-hidden="true"></div>
+  <div class="pointer-events-none absolute -right-32 top-1/4 h-[28rem] w-[28rem] rounded-full bg-electric-500/10 blur-3xl" aria-hidden="true"></div>
+
+  <div class="relative mx-auto grid w-full max-w-7xl items-center gap-14 px-5 lg:grid-cols-12">
+    <div class="lg:col-span-7">
+      <h1 class="max-w-2xl text-4xl font-medium leading-[1.08] text-white sm:text-5xl lg:text-6xl">
+        Cada animal del parque tiene un gemelo digital que avisa antes de que enferme.
+      </h1>
+      <p class="mt-6 max-w-xl text-lg leading-relaxed text-forest-100">
+        Zoo-Logic IA reúne cámaras, sensores y fichas veterinarias en un solo modelo vivo de cada individuo.
+        Cuando algo se aparta de lo normal, el equipo veterinario lo ve primero.
+      </p>
+      <div class="mt-9 flex flex-wrap gap-3">
+        <a routerLink="/panel" class="btn btn-primary">Abrir el panel veterinario</a>
+        <a routerLink="/chatbot" class="btn btn-ghost">Probar el chatbot educativo</a>
+      </div>
+    </div>
+
+    <!-- Telemetría de ejemplo: el gemelo digital de un animal -->
+    <div class="lg:col-span-5" appReveal="scale" revealDelay="150">
+      <figure class="animate-drift relative overflow-hidden rounded-2xl border border-electric-400/30 bg-ink-950/80 p-6 shadow-glow backdrop-blur">
+        <div class="animate-scan pointer-events-none absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-electric-400/0 via-electric-400/15 to-electric-400/0" aria-hidden="true"></div>
+        <figcaption class="flex items-start justify-between gap-4">
+          <div>
+            <p class="font-display text-xl text-white">Dumbo</p>
+            <p class="text-sm text-forest-200">Elefante asiático · Recinto Paquidermos</p>
+          </div>
+          <span class="rounded-full bg-ochre-300/20 px-3 py-1 text-xs font-semibold text-ochre-200">En observación</span>
+        </figcaption>
+
+        <svg viewBox="0 0 320 90" class="mt-5 h-20 w-full" role="img" aria-label="Pulso cardíaco simulado">
+          <polyline class="animate-pulseline" fill="none" stroke="#2fe3ff" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"
+                    stroke-dasharray="400"
+                    points="0,50 40,50 52,50 60,18 70,78 80,50 130,50 150,50 158,20 168,76 178,50 230,50 250,50 258,16 268,80 278,50 320,50"/>
+        </svg>
+
+        <dl class="mt-4 grid grid-cols-3 gap-4 border-t border-white/10 pt-4">
+          <div><dt class="text-xs text-forest-300">Pulso</dt><dd class="text-2xl font-medium text-white">32 <span class="text-sm text-forest-300">lpm</span></dd></div>
+          <div><dt class="text-xs text-forest-300">Temperatura</dt><dd class="text-2xl font-medium text-white">36,4 <span class="text-sm text-forest-300">°C</span></dd></div>
+          <div><dt class="text-xs text-forest-300">Anomalía</dt><dd class="text-2xl font-medium text-ochre-300">0,78</dd></div>
+        </dl>
+
+        <p class="mt-4 rounded-lg bg-white/5 p-3 text-sm leading-relaxed text-forest-100">
+          La cámara detecta menos apoyo en la pata trasera izquierda. Alerta enviada a la Dra. Ruiz para revisión.
+        </p>
+        <p class="mt-3 text-xs text-forest-300">Datos sintéticos de demostración.</p>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 2. PROBLEMA ============ -->
+<section id="problema" data-section class="bg-earth-100 py-24 text-ink-900 md:py-32">
+  <div class="mx-auto grid max-w-7xl gap-14 px-5 lg:grid-cols-12">
+    <div class="lg:col-span-5">
+      <div class="lg:sticky lg:top-32" appReveal="left">
+        <h2 class="text-3xl font-medium leading-tight text-forest-900 sm:text-4xl">
+          Los animales esconden el dolor. Los datos dispersos esconden el resto.
+        </h2>
+        <p class="mt-5 max-w-md leading-relaxed text-earth-800">
+          En la naturaleza, mostrar debilidad es un riesgo, así que muchas especies disimulan
+          que están enfermas hasta que el problema ya es serio.
+        </p>
+      </div>
+    </div>
+
+    <div class="lg:col-span-7">
+      <ul class="divide-y divide-earth-300 border-y border-earth-300">
+        <li class="py-8" appReveal revealDelay="0">
+          <h3 class="text-xl font-medium text-forest-800">Señales sutiles y tardías</h3>
+          <p class="mt-2 max-w-xl leading-relaxed text-earth-800">Un cambio en la marcha, en el apetito o en el sueño puede pasar inadvertido durante días entre cientos de individuos.</p>
+        </li>
+        <li class="py-8" appReveal revealDelay="120">
+          <h3 class="text-xl font-medium text-forest-800">Revisiones puntuales</h3>
+          <p class="mt-2 max-w-xl leading-relaxed text-earth-800">El equipo veterinario examina a cada animal de vez en cuando. Lo que ocurre entre una revisión y la siguiente no queda registrado.</p>
+        </li>
+        <li class="py-8" appReveal revealDelay="240">
+          <h3 class="text-xl font-medium text-forest-800">Información en silos</h3>
+          <p class="mt-2 max-w-xl leading-relaxed text-earth-800">Las cámaras, los comederos, los collares y las fichas clínicas guardan sus datos por separado, y nadie los cruza.</p>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 3. FUNCIONAMIENTO ============ -->
+<section id="funcionamiento" data-section class="relative overflow-hidden bg-deepblue-950 py-24 md:py-32">
+  <div class="bg-contours pointer-events-none absolute inset-0 opacity-[0.08]" aria-hidden="true"></div>
+  <div class="relative mx-auto max-w-7xl px-5">
+    <div class="max-w-3xl" appReveal>
+      <h2 class="text-3xl font-medium leading-tight text-white sm:text-4xl">Tres fuentes de datos, un solo gemelo digital.</h2>
+      <p class="mt-5 leading-relaxed text-blue-100/80">
+        La plataforma recoge información multimodal, la alinea en el tiempo y la compara con el comportamiento normal de cada animal.
+      </p>
+    </div>
+
+    <div class="mt-14 grid gap-px overflow-hidden rounded-2xl bg-white/10 md:grid-cols-3">
+      <article class="bg-deepblue-900 p-8" appReveal revealDelay="0">
+        <svg viewBox="0 0 24 24" class="h-9 w-9 text-electric-400" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+        <h3 class="mt-5 text-xl font-medium text-white">Visión computacional</h3>
+        <p class="mt-3 leading-relaxed text-blue-100/80">Las cámaras del recinto siguen a cada individuo y miden su marcha, su postura y su nivel de actividad sin molestarlo.</p>
+        <p class="mt-4 text-sm text-electric-200">Detecta cojeras, aislamiento y cambios de rutina.</p>
+      </article>
+      <article class="bg-deepblue-900 p-8" appReveal revealDelay="140">
+        <svg viewBox="0 0 24 24" class="h-9 w-9 text-electric-400" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+        <h3 class="mt-5 text-xl font-medium text-white">Sensores IoT</h3>
+        <p class="mt-3 leading-relaxed text-blue-100/80">Collares, comederos y básculas inteligentes envían temperatura, pulso, peso e ingesta de comida de forma continua.</p>
+        <p class="mt-4 text-sm text-electric-200">Detecta fiebre, pérdida de apetito y variaciones de peso.</p>
+      </article>
+      <article class="bg-deepblue-900 p-8" appReveal revealDelay="280">
+        <svg viewBox="0 0 24 24" class="h-9 w-9 text-electric-400" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12h6M9 16h6"/></svg>
+        <h3 class="mt-5 text-xl font-medium text-white">Registros estructurados</h3>
+        <p class="mt-3 leading-relaxed text-blue-100/80">Vacunas, tratamientos, revisiones y observaciones del personal se guardan en una base de datos consultable.</p>
+        <p class="mt-4 text-sm text-electric-200">Aporta el historial clínico que da contexto a cada alerta.</p>
+      </article>
+    </div>
+
+    <!-- Del dato al aviso -->
+    <div class="relative mt-16">
+    <div class="absolute left-0 right-0 top-[7px] hidden h-px bg-electric-400/40 md:block" appReveal="line" revealDelay="200" aria-hidden="true"></div>
+    <ol class="relative grid gap-8 md:grid-cols-4" aria-label="Del dato al aviso">
+      @for (step of flow; track step.title; let i = $index) {
+        <li class="relative" appReveal [revealDelay]="i * 150">
+          <span class="relative z-10 block h-3.5 w-3.5 rounded-full border-2 border-electric-400 bg-deepblue-950"></span>
+          <p class="mt-4 font-medium text-white">{{ step.title }}</p>
+          <p class="mt-1 text-sm leading-relaxed text-blue-100/70">{{ step.text }}</p>
+        </li>
+      }
+    </ol>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 4. DOS PÚBLICOS ============ -->
+<section id="publicos" data-section class="bg-forest-50 py-24 text-ink-900 md:py-32">
+  <div class="mx-auto max-w-7xl px-5">
+    <div class="max-w-3xl" appReveal>
+      <h2 class="text-3xl font-medium leading-tight text-forest-900 sm:text-4xl">Una plataforma, dos formas de usarla.</h2>
+      <p class="mt-5 leading-relaxed text-earth-800">El mismo conocimiento sobre los animales llega de manera distinta a quien los cuida y a quien viene a conocerlos.</p>
+    </div>
+
+    <div class="mt-14 grid overflow-hidden rounded-3xl lg:grid-cols-2">
+      <article class="bg-forest-900 p-9 text-forest-50 sm:p-12" appReveal="left">
+        <h3 class="text-2xl font-medium text-white">Panel veterinario</h3>
+        <p class="mt-3 max-w-md leading-relaxed text-forest-100">Para profesionales que necesitan decidir rápido con toda la información delante.</p>
+        <ul class="mt-6 space-y-3 text-forest-100">
+          <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-ochre-300"></span>Ficha de cada animal con estado de salud y alertas pendientes.</li>
+          <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-ochre-300"></span>Historial de seguimiento con origen del dato: veterinario, sensor, cámara o IA.</li>
+          <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-ochre-300"></span>Botón para validar cada alerta y enseñar al modelo cuándo acierta.</li>
+        </ul>
+        <a routerLink="/panel" class="btn btn-primary mt-8">Entrar al panel</a>
+      </article>
+
+      <article class="bg-ink-900 p-9 text-forest-50 sm:p-12" appReveal="right">
+        <h3 class="text-2xl font-medium text-white">Chatbot educativo</h3>
+        <p class="mt-3 max-w-md leading-relaxed text-forest-100">Para visitantes curiosos que quieren entender a los animales que tienen delante.</p>
+        <ul class="mt-6 space-y-3 text-forest-100">
+          <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-electric-400"></span>Responde sobre dieta, hábitat y nombre científico de cada especie.</li>
+          <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-electric-400"></span>Explica en qué estado de conservación está y por qué importa.</li>
+          <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-electric-400"></span>Propone nuevas preguntas para seguir aprendiendo.</li>
+        </ul>
+        <a routerLink="/chatbot" class="btn btn-ghost mt-8">Hacer una pregunta</a>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 5. METODOLOGÍA ============ -->
+<section id="metodologia" data-section class="bg-ink-950 py-24 md:py-32">
+  <div class="mx-auto max-w-7xl px-5">
+    <div class="max-w-3xl" appReveal>
+      <h2 class="text-3xl font-medium leading-tight text-white sm:text-4xl">Un modelo que aprende de los datos y de las personas.</h2>
+      <p class="mt-5 leading-relaxed text-forest-100">
+        El aprendizaje es mixto. La máquina propone y los expertos corrigen, y cada corrección mejora la siguiente predicción.
+      </p>
+    </div>
+
+    <ol class="mt-14 grid gap-10 lg:grid-cols-3">
+      @for (m of method; track m.title; let i = $index) {
+        <li class="border-t border-electric-400/40 pt-6" appReveal [revealDelay]="i * 160">
+          <p class="font-display text-4xl text-electric-400">{{ i + 1 }}</p>
+          <h3 class="mt-4 text-xl font-medium text-white">{{ m.title }}</h3>
+          <p class="mt-3 leading-relaxed text-forest-100">{{ m.text }}</p>
+        </li>
+      }
+    </ol>
+
+    <p class="mt-12 max-w-2xl rounded-xl border border-white/10 bg-white/5 p-5 leading-relaxed text-forest-100" appReveal>
+      El ciclo no termina. Cada alerta validada o descartada vuelve al conjunto de entrenamiento y el modelo se reentrena con ella.
+    </p>
+  </div>
+</section>
+
+<!-- ============ 6. IMPACTO ============ -->
+<section id="impacto" data-section class="relative overflow-hidden bg-forest-900 py-24 md:py-32">
+  <div class="bg-contours pointer-events-none absolute inset-0 opacity-20" aria-hidden="true"></div>
+  <div class="relative mx-auto max-w-7xl px-5">
+    <div class="max-w-4xl" appReveal>
+      <h2 class="text-3xl font-medium leading-tight text-white sm:text-5xl">
+        Cuidar mejor a cada individuo es cuidar a toda la especie.
+      </h2>
+      <p class="mt-6 max-w-2xl text-lg leading-relaxed text-forest-100">
+        Muchas de las especies que viven en zoológicos y parques naturales participan en programas de conservación.
+        Detectar un problema a tiempo protege a un animal y también a la población de la que forma parte.
+      </p>
+    </div>
+
+    <div class="mt-14 grid gap-10 md:grid-cols-3">
+      <div class="border-t-2 border-ochre-300 pt-5" appReveal revealDelay="0">
+        <h3 class="text-xl font-medium text-ochre-200">Intervenir antes</h3>
+        <p class="mt-2 leading-relaxed text-forest-100">Un aviso temprano permite tratar con menos medicación y menos manipulación del animal.</p>
+      </div>
+      <div class="border-t-2 border-ochre-300 pt-5" appReveal revealDelay="140">
+        <h3 class="text-xl font-medium text-ochre-200">Menos estrés</h3>
+        <p class="mt-2 leading-relaxed text-forest-100">La observación continua sustituye a muchos exámenes que obligan a capturar o sedar.</p>
+      </div>
+      <div class="border-t-2 border-ochre-300 pt-5" appReveal revealDelay="280">
+        <h3 class="text-xl font-medium text-ochre-200">Datos para conservar</h3>
+        <p class="mt-2 leading-relaxed text-forest-100">Los historiales alimentan la investigación y la gestión de la cría de especies amenazadas.</p>
+      </div>
+    </div>
+
+    <div class="mt-16 flex flex-wrap items-center gap-4" appReveal>
+      <a routerLink="/panel" class="btn btn-primary">Ver el panel en acción</a>
+      <a routerLink="/chatbot" class="btn btn-ghost">Conversar con el chatbot</a>
+    </div>
+  </div>
+</section>

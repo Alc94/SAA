@@ -1,0 +1,50 @@
+name: zoo-logic-ia
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: zoologic-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-zoologic}
+      POSTGRES_USER: ${POSTGRES_USER:-zoologic}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-zoologic_dev_pw}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      # Los scripts .sql se ejecutan una sola vez, al crear el volumen por primera vez
+      - ./database/init:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  backend:
+    build:
+      context: ./backend
+    container_name: zoologic-api
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__Default: Host=db;Port=5432;Database=${POSTGRES_DB:-zoologic};Username=${POSTGRES_USER:-zoologic};Password=${POSTGRES_PASSWORD:-zoologic_dev_pw}
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: zoologic-web
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "4200:80"
+
+volumes:
+  pgdata:

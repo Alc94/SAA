@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html { scroll-behavior: smooth; }
+  body {
+    @apply bg-ink-950 font-sans text-base text-forest-50 antialiased;
+    font-feature-settings: 'tnum' 1;
+  }
+  h1, h2, h3 { @apply font-display; }
+  :focus-visible { @apply outline-none ring-2 ring-electric-400 ring-offset-2 ring-offset-ink-950; }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-colors duration-200;
+  }
+  .btn-primary { @apply bg-electric-400 text-ink-950 shadow-glow hover:bg-electric-300; }
+  .btn-ghost   { @apply border border-white/25 text-white hover:bg-white/10; }
+  .btn-forest  { @apply bg-forest-700 text-white hover:bg-forest-600; }
+  .btn-outline { @apply border border-earth-300 bg-white text-earth-800 hover:bg-earth-50; }
+  .btn-danger  { @apply border border-red-200 bg-white text-red-700 hover:bg-red-50; }
+
+  .field {
+    @apply w-full rounded-lg border border-earth-200 bg-white px-3 py-2 text-sm text-ink-900
+           placeholder:text-earth-400 focus:border-forest-500 focus:outline-none focus:ring-2 focus:ring-forest-300;
+  }
+  .field-label { @apply mb-1 block text-sm font-medium text-earth-800; }
+  .field-error { @apply mt-1 text-xs text-red-700; }
+}
+
+/* Textura de curvas de nivel: biodiversidad + cartografía de datos */
+.bg-contours {
+  background-image: url('/contours.svg');
+  background-size: cover;
+  background-position: center;
+}
+
+/* ---- Animaciones de entrada al hacer scroll (ver reveal.directive.ts) ---- */
+.reveal {
+  opacity: 0;
+  transform: translate3d(0, 28px, 0);
+  transition: opacity 0.8s cubic-bezier(.2,.7,.2,1), transform 0.8s cubic-bezier(.2,.7,.2,1);
+  will-change: opacity, transform;
+}
+.reveal-left  { transform: translate3d(-48px, 0, 0); }
+.reveal-right { transform: translate3d(48px, 0, 0); }
+.reveal-scale { transform: scale(.94); }
+.reveal-line  { transform: scaleX(0); transform-origin: left center; }
+.reveal.is-visible { opacity: 1; transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .reveal { opacity: 1; transform: none; transition: none; }
+  .animate-scan, .animate-pulseline, .animate-drift { animation: none !important; }
+}
