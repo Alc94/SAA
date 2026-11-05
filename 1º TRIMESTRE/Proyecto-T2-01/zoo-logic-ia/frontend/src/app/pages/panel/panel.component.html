@@ -1,0 +1,256 @@
+<section class="min-h-screen bg-earth-50 pb-20 pt-24 text-ink-900">
+  <div class="mx-auto max-w-7xl px-5">
+
+    <header class="flex flex-wrap items-end justify-between gap-4 pt-6" appReveal>
+      <div>
+        <h1 class="text-3xl font-medium text-forest-900 sm:text-4xl">Panel veterinario</h1>
+        <p class="mt-2 max-w-xl text-earth-800">Gestiona los animales del parque y revisa su seguimiento. Valida las alertas de la IA para mejorar sus predicciones.</p>
+      </div>
+      <button type="button" class="btn btn-forest" (click)="openCreate()">Añadir animal</button>
+    </header>
+
+    <!-- Resumen -->
+    @if (stats(); as s) {
+      <dl class="mt-8 grid grid-cols-2 gap-4 md:grid-cols-5" appReveal revealDelay="100">
+        <div class="rounded-xl border border-earth-200 bg-white p-4"><dt class="text-sm text-earth-700">Animales</dt><dd class="mt-1 text-3xl font-medium text-forest-900">{{ s.total }}</dd></div>
+        <div class="rounded-xl border border-earth-200 bg-white p-4"><dt class="text-sm text-earth-700">Saludables</dt><dd class="mt-1 text-3xl font-medium text-forest-600">{{ s.healthy }}</dd></div>
+        <div class="rounded-xl border border-earth-200 bg-white p-4"><dt class="text-sm text-earth-700">En observación</dt><dd class="mt-1 text-3xl font-medium text-ochre-600">{{ s.observation }}</dd></div>
+        <div class="rounded-xl border border-earth-200 bg-white p-4"><dt class="text-sm text-earth-700">Críticos</dt><dd class="mt-1 text-3xl font-medium text-red-700">{{ s.critical }}</dd></div>
+        <div class="col-span-2 rounded-xl border border-deepblue-700 bg-deepblue-900 p-4 md:col-span-1">
+          <dt class="text-sm text-blue-100/80">Alertas por validar</dt><dd class="mt-1 text-3xl font-medium text-electric-400">{{ s.pendingValidation }}</dd>
+        </div>
+      </dl>
+    }
+
+    <!-- Filtros -->
+    <div class="mt-8 flex flex-wrap gap-3">
+      <div class="min-w-[14rem] flex-1">
+        <label for="search" class="sr-only">Buscar animales</label>
+        <input #q id="search" type="search" class="field" placeholder="Buscar por nombre, código, especie o recinto" (input)="onSearch(q.value)">
+      </div>
+      <div>
+        <label for="status" class="sr-only">Filtrar por estado</label>
+        <select #st id="status" class="field" (change)="onStatus(st.value)">
+          <option value="">Todos los estados</option>
+          @for (h of healthStates; track h) { <option [value]="h">{{ h }}</option> }
+        </select>
+      </div>
+    </div>
+
+    @if (error(); as e) {
+      <p role="alert" class="mt-6 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">{{ e }}</p>
+    }
+
+    <!-- Tabla -->
+    <div class="mt-6 overflow-x-auto rounded-xl border border-earth-200 bg-white">
+      <table class="w-full min-w-[56rem] text-left text-sm">
+        <thead class="border-b border-earth-200 bg-earth-100 text-earth-800">
+          <tr>
+            <th scope="col" class="px-4 py-3 font-medium">Animal</th>
+            <th scope="col" class="px-4 py-3 font-medium">Código</th>
+            <th scope="col" class="px-4 py-3 font-medium">Especie</th>
+            <th scope="col" class="px-4 py-3 font-medium">Recinto</th>
+            <th scope="col" class="px-4 py-3 text-right font-medium">Peso (kg)</th>
+            <th scope="col" class="px-4 py-3 font-medium">Estado</th>
+            <th scope="col" class="px-4 py-3 text-right font-medium">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-earth-100">
+          @for (a of animals(); track a.id) {
+            <tr class="hover:bg-earth-50">
+              <td class="px-4 py-3">
+                <p class="font-medium text-forest-900">{{ a.name }}</p>
+                <p class="text-xs text-earth-700">{{ a.sex }}@if (a.birthDate) { · nac. {{ a.birthDate | date: 'dd/MM/yyyy' }} }</p>
+              </td>
+              <td class="px-4 py-3 text-earth-800">{{ a.tagCode }}</td>
+              <td class="px-4 py-3">{{ a.speciesName }}</td>
+              <td class="px-4 py-3">{{ a.enclosure }}</td>
+              <td class="px-4 py-3 text-right">{{ a.weightKg | number: '1.0-1' }}</td>
+              <td class="px-4 py-3">
+                <span class="rounded-full px-2.5 py-1 text-xs font-medium" [class]="statusClass(a.healthStatus)">{{ a.healthStatus }}</span>
+              </td>
+              <td class="px-4 py-3">
+                <div class="flex justify-end gap-2">
+                  <button type="button" class="btn btn-outline !px-3 !py-1.5" (click)="openRecords(a)">Seguimiento</button>
+                  <button type="button" class="btn btn-outline !px-3 !py-1.5" (click)="openEdit(a)">Editar</button>
+                  <button type="button" class="btn btn-danger !px-3 !py-1.5" (click)="remove(a)">Eliminar</button>
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="7" class="px-4 py-12 text-center text-earth-700">
+                @if (loading()) { Cargando animales... } @else { No hay animales con estos filtros. Añade el primero con el botón «Añadir animal». }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Modal: crear / editar animal ============ -->
+@if (showForm()) {
+  <div class="fixed inset-0 z-[70] flex items-start justify-center overflow-y-auto bg-ink-950/60 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="form-title">
+    <form [formGroup]="form" (ngSubmit)="save()" class="my-8 w-full max-w-2xl rounded-2xl bg-white p-6 text-ink-900 shadow-2xl sm:p-8">
+      <h2 id="form-title" class="text-2xl font-medium text-forest-900">{{ editingId() === null ? 'Añadir animal' : 'Editar animal' }}</h2>
+
+      <div class="mt-6 grid gap-4 sm:grid-cols-2">
+        <div>
+          <label class="field-label" for="f-name">Nombre</label>
+          <input id="f-name" class="field" formControlName="name" maxlength="80">
+          @if (form.controls.name.touched && form.controls.name.invalid) { <p class="field-error">Escribe el nombre del animal.</p> }
+        </div>
+        <div>
+          <label class="field-label" for="f-tag">Código de microchip o sensor</label>
+          <input id="f-tag" class="field" formControlName="tagCode" maxlength="40" placeholder="LEO-0003">
+          @if (form.controls.tagCode.touched && form.controls.tagCode.invalid) { <p class="field-error">El código es obligatorio.</p> }
+        </div>
+        <div>
+          <label class="field-label" for="f-species">Especie</label>
+          <select id="f-species" class="field" formControlName="speciesId">
+            @for (s of species(); track s.id) { <option [ngValue]="s.id">{{ s.commonName }}</option> }
+          </select>
+          @if (form.controls.speciesId.invalid) { <p class="field-error">Selecciona una especie.</p> }
+        </div>
+        <div>
+          <label class="field-label" for="f-enclosure">Recinto</label>
+          <input id="f-enclosure" class="field" formControlName="enclosure" maxlength="80">
+          @if (form.controls.enclosure.touched && form.controls.enclosure.invalid) { <p class="field-error">Indica el recinto.</p> }
+        </div>
+        <div>
+          <label class="field-label" for="f-sex">Sexo</label>
+          <select id="f-sex" class="field" formControlName="sex">
+            @for (x of sexes; track x) { <option [value]="x">{{ x }}</option> }
+          </select>
+        </div>
+        <div>
+          <label class="field-label" for="f-birth">Fecha de nacimiento</label>
+          <input id="f-birth" type="date" class="field" formControlName="birthDate">
+        </div>
+        <div>
+          <label class="field-label" for="f-weight">Peso (kg)</label>
+          <input id="f-weight" type="number" step="0.1" min="0" class="field" formControlName="weightKg">
+          @if (form.controls.weightKg.invalid) { <p class="field-error">El peso debe ser 0 o mayor.</p> }
+        </div>
+        <div>
+          <label class="field-label" for="f-health">Estado de salud</label>
+          <select id="f-health" class="field" formControlName="healthStatus">
+            @for (h of healthStates; track h) { <option [value]="h">{{ h }}</option> }
+          </select>
+        </div>
+        <div class="sm:col-span-2">
+          <label class="field-label" for="f-notes">Notas</label>
+          <textarea id="f-notes" rows="3" class="field" formControlName="notes" maxlength="1000"></textarea>
+        </div>
+      </div>
+
+      @if (formError(); as fe) {
+        <p role="alert" class="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800">{{ fe }}</p>
+      }
+
+      <div class="mt-6 flex justify-end gap-3">
+        <button type="button" class="btn btn-outline" (click)="closeForm()">Cancelar</button>
+        <button type="submit" class="btn btn-forest" [disabled]="saving()">{{ saving() ? 'Guardando...' : (editingId() === null ? 'Crear animal' : 'Guardar cambios') }}</button>
+      </div>
+    </form>
+  </div>
+}
+
+<!-- ============ Panel lateral: seguimiento veterinario ============ -->
+@if (selected(); as animal) {
+  <div class="fixed inset-0 z-[70] flex justify-end bg-ink-950/60 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="rec-title">
+    <aside class="h-full w-full max-w-xl overflow-y-auto bg-white p-6 text-ink-900 shadow-2xl sm:p-8">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <h2 id="rec-title" class="text-2xl font-medium text-forest-900">Seguimiento de {{ animal.name }}</h2>
+          <p class="text-sm text-earth-700">{{ animal.speciesName }} · {{ animal.tagCode }}</p>
+        </div>
+        <button type="button" class="btn btn-outline !px-3 !py-1.5" (click)="closeRecords()">Cerrar</button>
+      </div>
+
+      @if (recordError(); as re) {
+        <p role="alert" class="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800">{{ re }}</p>
+      }
+
+      <!-- Nuevo registro -->
+      <form [formGroup]="recordForm" (ngSubmit)="addRecord()" class="mt-6 rounded-xl border border-earth-200 bg-earth-50 p-4">
+        <h3 class="text-lg font-medium text-forest-800">Nuevo registro</h3>
+        <div class="mt-3 grid gap-3 sm:grid-cols-2">
+          <div>
+            <label class="field-label" for="r-type">Tipo</label>
+            <select id="r-type" class="field" formControlName="recordType">
+              @for (t of recordTypes; track t) { <option [value]="t">{{ t }}</option> }
+            </select>
+          </div>
+          <div>
+            <label class="field-label" for="r-source">Origen del dato</label>
+            <select id="r-source" class="field" formControlName="source">
+              @for (s of sources; track s) { <option [value]="s">{{ s }}</option> }
+            </select>
+          </div>
+          <div class="sm:col-span-2">
+            <label class="field-label" for="r-desc">Descripción</label>
+            <textarea id="r-desc" rows="2" class="field" formControlName="description" maxlength="1000"></textarea>
+            @if (recordForm.controls.description.touched && recordForm.controls.description.invalid) { <p class="field-error">Describe lo observado.</p> }
+          </div>
+          <div>
+            <label class="field-label" for="r-temp">Temperatura (°C)</label>
+            <input id="r-temp" type="number" step="0.1" class="field" formControlName="temperatureC">
+            @if (recordForm.controls.temperatureC.invalid) { <p class="field-error">Entre 20 y 50 °C.</p> }
+          </div>
+          <div>
+            <label class="field-label" for="r-hr">Pulso (lpm)</label>
+            <input id="r-hr" type="number" class="field" formControlName="heartRateBpm">
+            @if (recordForm.controls.heartRateBpm.invalid) { <p class="field-error">Entre 1 y 600.</p> }
+          </div>
+          <div>
+            <label class="field-label" for="r-anom">Puntuación de anomalía (0 a 1)</label>
+            <input id="r-anom" type="number" step="0.01" min="0" max="1" class="field" formControlName="anomalyScore">
+            @if (recordForm.controls.anomalyScore.invalid) { <p class="field-error">Entre 0 y 1.</p> }
+          </div>
+          <div>
+            <label class="field-label" for="r-vet">Responsable</label>
+            <input id="r-vet" class="field" formControlName="veterinarian" maxlength="80">
+            @if (recordForm.controls.veterinarian.touched && recordForm.controls.veterinarian.invalid) { <p class="field-error">Indica quién registra.</p> }
+          </div>
+        </div>
+        <p class="mt-3 text-xs text-earth-700">Con una anomalía de 0,6 o más, un animal saludable pasa automáticamente a «En observación».</p>
+        <button type="submit" class="btn btn-forest mt-3">Guardar registro</button>
+      </form>
+
+      <!-- Historial -->
+      <h3 class="mt-8 text-lg font-medium text-forest-800">Historial</h3>
+      <ul class="mt-3 space-y-3">
+        @for (r of records(); track r.id) {
+          <li class="rounded-xl border p-4" [class]="isAlert(r) && !r.validatedByExpert ? 'border-ochre-300 bg-ochre-50' : 'border-earth-200 bg-white'">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <p class="font-medium text-forest-900">{{ r.recordType }}</p>
+              <p class="text-xs text-earth-700">{{ r.recordDate | date: 'dd/MM/yyyy HH:mm' }}</p>
+            </div>
+            <p class="mt-1 text-sm leading-relaxed">{{ r.description }}</p>
+            <p class="mt-2 text-xs text-earth-700">
+              Origen: {{ r.source }} · {{ r.veterinarian }}
+              @if (r.temperatureC !== null) { · {{ r.temperatureC | number: '1.1-1' }} °C }
+              @if (r.heartRateBpm !== null) { · {{ r.heartRateBpm }} lpm }
+              @if (r.anomalyScore !== null) { · anomalía {{ r.anomalyScore | number: '1.2-2' }} }
+            </p>
+            <div class="mt-3 flex flex-wrap items-center gap-2">
+              @if (r.validatedByExpert) {
+                <span class="rounded-full bg-forest-100 px-2.5 py-1 text-xs font-medium text-forest-800">Validado por experto</span>
+              } @else {
+                <button type="button" class="btn btn-forest !px-3 !py-1.5" (click)="validate(r)">Validar</button>
+              }
+              <button type="button" class="btn btn-danger !px-3 !py-1.5" (click)="removeRecord(r)">Eliminar</button>
+            </div>
+          </li>
+        } @empty {
+          <li class="rounded-xl border border-dashed border-earth-300 p-6 text-center text-sm text-earth-700">
+            @if (recordsLoading()) { Cargando historial... } @else { Este animal aún no tiene registros. Añade el primero arriba. }
+          </li>
+        }
+      </ul>
+    </aside>
+  </div>
+}
